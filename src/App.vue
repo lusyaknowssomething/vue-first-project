@@ -1,42 +1,43 @@
 <template>
-  <div>
-    <form>
-      <input type="text" placeholder="Название">
-      <input type="text" placeholder="Описание">
-    </form>
-    <div class="post" v-for="post in posts" :key="post.id">
-      <div><strong>Название:</strong> {{post.title}}</div>
-      <div><strong>Описание:</strong>{{post.body}}</div>
-    </div>
+  <div class="app">
+    <post-form @create="createPost" />
+    <post-list :posts="posts" />
   </div>
 </template>
 
 <script>
+import PostForm from "./components/PostForm.vue";
+import PostList from "@/components/PostList.vue";
 export default {
+  components: {
+    PostForm, PostList
+  },
+
   data() {
     return {
       posts: [
-        {id: 0, title: 'JavaScript', body: 'Описание поста'},
-        {id: 1, title: 'JavaScript1', body: 'Описание поста1'},
-        {id: 2, title: 'JavaScript2', body: 'Описание поста2'},
-      ]
+        { id: 0, title: 'JavaScript', body: 'Описание поста 1' },
+        { id: 1, title: 'JavaScript1', body: 'Описание поста 2' },
+        { id: 2, title: 'JavaScript2', body: 'Описание поста 3' },
+      ],
     }
   },
   methods: {
+    createPost(post) {
+      this.posts.push(post);
+    },
   }
 }
 </script>
 
 <style scoped>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  .post {
-    padding: 15px;
-    border: 1px solid teal;
-    margin-top: 15px;
-  }
+.app {
+  padding: 20px;
+}
 </style>
