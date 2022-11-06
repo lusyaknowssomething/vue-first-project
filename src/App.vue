@@ -1,21 +1,21 @@
 <template>
   <div class="app">
     <h1>Страница с постами</h1>
+    <my-input
+      class="app__input"
+      v-model="searchQuery"
+      placeholder="Поиск"
+    />
     <div class="app__btns">
       <my-button @click="showDialog">
         Создать пост
       </my-button>
-      <my-select
-        v-model="selectedSort"
-        :options="sortOptions"
-      >
-      </my-select>
-    </div>
+      </div>
     <my-dialog v-model:show="dialogVisible">
       <post-form @create="createPost" />
     </my-dialog>
     <post-list
-      :posts="posts"
+      :posts="searchedPosts"
       @remove="removePost"
       v-if="!isPostLoading"
     />
@@ -37,7 +37,7 @@ export default {
       posts: [],
       dialogVisible: false,
       isPostLoading: false,
-      selectedSort: '',
+      searchQuery: '',
       sortOptions: [
         {value: 'title', name: 'По названию'},
         {value: 'body', name: 'По описанию'}
@@ -50,7 +50,6 @@ export default {
       this.dialogVisible = false;
     },
     removePost(post) {
-      console.log('here')
       this.posts = this.posts.filter(p => p.id !== post.id)
     },
     showDialog() {
@@ -71,9 +70,9 @@ export default {
   mounted() {
     this.fetchPosts();
   },
-  watch: {
-    selectedSort(newValue) {
-      console.log(newValue)
+  computed: {
+    searchedPosts() {
+      return [...this.posts].filter(post => post.title.toLocaleLowerCase().includes(this.searchQuery.toLocaleLowerCase()));
     }
   }
 }
@@ -88,6 +87,10 @@ export default {
 
 .app {
   padding: 20px;
+}
+
+.app__input {
+  width: 100%;
 }
 
 .app__btns {
