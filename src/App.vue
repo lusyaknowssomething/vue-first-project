@@ -20,6 +20,19 @@
       v-if="!isPostLoading"
     />
     <p v-else>Идет загрузка...</p>
+    <div class="page__wrapper">
+      <div
+        class="page"
+        :class="{
+          'current-page': pageNumber === page
+        }"
+        v-for="pageNumber in totalPages"
+        :key="pageNumber"
+        @click="changePage(pageNumber)"
+      >
+        {{ pageNumber }}
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -38,6 +51,9 @@ export default {
       dialogVisible: false,
       isPostLoading: false,
       searchQuery: '',
+      page: 1,
+      limit: 10,
+      totalPages: 0,
       sortOptions: [
         {value: 'title', name: 'По названию'},
         {value: 'body', name: 'По описанию'}
@@ -55,10 +71,19 @@ export default {
     showDialog() {
       this.dialogVisible = true;
     },
+    changePage(pageNumber) {
+      this.page = pageNumber;
+    },
     async fetchPosts() {
       try {
         this.isPostLoading = true;
-        const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10');
+        const response = await axios.get('https://jsonplaceholder.typicode.com/posts?', {
+          params: {
+            _page: this.page,
+            _limit: this.limit,
+          }
+        });
+        this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit)
         this.posts = response.data;
       } catch(e) {
         alert("Произошла ошибка")
@@ -73,6 +98,11 @@ export default {
   computed: {
     searchedPosts() {
       return [...this.posts].filter(post => post.title.toLocaleLowerCase().includes(this.searchQuery.toLocaleLowerCase()));
+    }
+  },
+  watch: {
+    page() {
+      this.fetchPosts();
     }
   }
 }
@@ -97,5 +127,20 @@ export default {
   display: flex;
   justify-content: space-between;
   margin: 15px 0;
+}
+
+.page__wrapper {
+  display: flex;
+  margin-top: 15px;
+  gap: 5px;
+}
+
+.page {
+  border: 1px solid black;
+  padding: 10px;
+}
+
+.current-page {
+  border: 2px solid teal;
 }
 </style>
